@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       # used to cache dependencies with a timeout
       - name: Get Date
@@ -18,7 +18,7 @@ jobs:
         shell: bash
 
       - name: Cache Buildozer global directory
-        uses: actions/cache@v4.2.3
+        uses: actions/cache@v4
 
         with:
           path: .buildozer_global
@@ -31,13 +31,13 @@ jobs:
           key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('buildozer.spec') }}
 
       - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
+        uses: ArtemSBulgakov/buildozer-action@v4
         id: buildozer
         with:
           command: buildozer android debug
           buildozer_version: master
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
   
 
         with:
