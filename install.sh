@@ -14,7 +14,7 @@ mkdir -p "$BOT_NAME"
 cd "$BOT_NAME" || exit
 
 # Link do ZIP do bot
-BOT_ZIP_URL="https://www.dropbox.com/scl/fi/lzy2lj1t2yix12zdbpoff/cenira.zip?rlkey=pqv5dzqdfs8uoc6g46ep3ovgp&st=f3c0klxn&dl=1"
+BOT_ZIP_URL="https://github.com/Henrique28122000/app1/raw/refs/heads/main/cenira.zip"
 
 # Baixar o ZIP
 echo "⬇️ Baixando o bot..."
