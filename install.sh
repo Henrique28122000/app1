@@ -1,26 +1,36 @@
 #!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
 
 echo "📦 Instalador automático do bot"
 
 # Nome padrão da pasta
 BOT_NAME="meu_bot"
 read -p "Digite o nome da pasta do bot (pressione Enter para '$BOT_NAME'): " INPUT_NAME
-if [ ! -z "$INPUT_NAME" ]; then
+if [ -n "$INPUT_NAME" ]; then
   BOT_NAME="$INPUT_NAME"
 fi
 
 # Criar pasta e entrar nela
 mkdir -p "$BOT_NAME"
 cd "$BOT_NAME" || exit
+BOT_DIR=$(pwd)
+echo "➡ Pasta do bot: $BOT_DIR"
 
-# Link do ZIP do bot
-BOT_ZIP_URL="https://github.com/Henrique28122000/app1/raw/refs/heads/main/cenira.zip"
+# Link do ZIP do bot (verifique se este link é válido)
+BOT_ZIP_URL="https://github.com/Henrique28122000/app1/raw/main/cenira.zip"
 
 # Baixar o ZIP
 echo "⬇️ Baixando o bot..."
 curl -L -o bot.zip "$BOT_ZIP_URL"
 
-# Verificar se unzip está instalado
+# Verificar se o ZIP foi baixado
+if [ ! -f bot.zip ]; then
+  echo "❌ Falha ao baixar bot.zip"
+  exit 1
+fi
+
+# Instalar unzip se necessário
 if ! command -v unzip >/dev/null 2>&1; then
     echo "🔹 Instalando unzip..."
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -37,8 +47,6 @@ fi
 # Extrair
 echo "📂 Extraindo arquivos..."
 unzip -o bot.zip -d .
-
-# Remover o ZIP
 rm -f bot.zip
 
 # Solicitar links ao usuário
@@ -46,7 +54,7 @@ echo ""
 read -p "Digite o link para config.json: " LINK_CONFIG
 read -p "Digite o link para menu.json: " LINK_MENU
 
-# Criar links.json dentro da pasta atual
+# Criar links.json
 cat > links.json <<EOL
 {
   "config": "$LINK_CONFIG",
@@ -54,10 +62,24 @@ cat > links.json <<EOL
 }
 EOL
 
+# Baixar config.json e menu.json
+if [ -n "$LINK_CONFIG" ]; then
+  echo "⬇️ Baixando config.json..."
+  curl -L -o config.json "$LINK_CONFIG"
+fi
+
+if [ -n "$LINK_MENU" ]; then
+  echo "⬇️ Baixando menu.json..."
+  curl -L -o menu.json "$LINK_MENU"
+fi
+
 echo ""
 echo "✅ Bot instalado com sucesso na pasta '$BOT_NAME'!"
+echo "📌 Arquivos dentro da pasta do bot:"
+ls -l
+echo ""
 echo "📌 Para rodar o bot, digite:"
-echo "cd $BOT_NAME"
+echo "cd $BOT_DIR"
 echo "node index.js"
 echo ""
 echo "🚀 Pronto para uso!"
