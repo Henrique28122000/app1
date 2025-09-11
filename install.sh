@@ -18,7 +18,7 @@ BOT_DIR=$(pwd)
 echo "➡ Pasta do bot: $BOT_DIR"
 
 # Link do ZIP do bot (verifique se este link é válido)
-BOT_ZIP_URL="https://www.dropbox.com/scl/fi/lzy2lj1t2yix12zdbpoff/cenira.zip?rlkey=pqv5dzqdfs8uoc6g46ep3ovgp&st=oimrjdz8&dl=1"
+BOT_ZIP_URL="https://github.com/Henrique28122000/app1/raw/main/bot.zip"
 
 # Baixar o ZIP
 echo "⬇️ Baixando o bot..."
