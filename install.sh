@@ -18,11 +18,11 @@ BOT_DIR=$(pwd)
 echo "➡ Pasta do bot: $BOT_DIR"
 
 # Link do ZIP do bot (verifique se este link é válido)
-BOT_ZIP_URL="https://github.com/Henrique28122000/app1/raw/main/bot.zip"
+
+wget --no-check-certificate 'https://drive.google.com/uc?export=download&id=1FrY9D1ntW_aksEcJ-0zU8sPahhBmkm-v' -O bot.zip
 
 # Baixar o ZIP
 echo "⬇️ Baixando o bot..."
-curl -L -o bot.zip "$BOT_ZIP_URL"
 
 # Verificar se o ZIP foi baixado
 if [ ! -f bot.zip ]; then
