@@ -14,15 +14,15 @@ jobs:
 
       - name: Executar script Python
         env:
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          CHAT_ID: ${{ secrets.CHAT_ID }}
+          TELEGRAM_TOKEN: "5600089920:AAE58XD5WFIKwfSJy1KERw5CGwvFHFYmjvE"
+          CHAT_ID: "5060246658"
         run: |
           python - <<'EOF'
           import requests, hashlib, os, json, datetime
 
           FILE_URL = "https://cetredeneoconcursos.com.br/Concursos_PDF/093_Concurso/093_Concurso093.pdf"
-          TOKEN = os.environ["5600089920:AAE58XD5WFIKwfSJy1KERw5CGwvFHFYmjvE"]
-          CHAT_ID = os.environ["5060246658"]
+          TOKEN = os.environ["TELEGRAM_TOKEN"]
+          CHAT_ID = os.environ["CHAT_ID"]
           STATE_FILE = "state.json"
 
           def get_hash():
