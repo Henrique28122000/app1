@@ -1,82 +1,82 @@
-name: Monitorar PDF e responder mensagens
+# name: Monitorar PDF e responder mensagens
 
-on:
-  schedule:
-    - cron: "*/5 * * * *"  # executa a cada 5 minutos
-  workflow_dispatch:
+# on:
+#   schedule:
+#     - cron: "*/5 * * * *"  # executa a cada 5 minutos
+#   workflow_dispatch:
 
-jobs:
-  monitorar:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Instalar dependências
-        run: pip install requests
+# jobs:
+#   monitorar:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Instalar dependências
+#         run: pip install requests
 
-      - name: Executar script Python
-        env:
-          TELEGRAM_TOKEN: "5600089920:AAE58XD5WFIKwfSJy1KERw5CGwvFHFYmjvE"
-          CHAT_ID: "5060246658"
-        run: |
-          python - <<'EOF'
-          import requests, hashlib, os, json, datetime
+#       - name: Executar script Python
+#         env:
+#           TELEGRAM_TOKEN: "5600089920:AAE58XD5WFIKwfSJy1KERw5CGwvFHFYmjvE"
+#           CHAT_ID: "5060246658"
+#         run: |
+#           python - <<'EOF'
+#           import requests, hashlib, os, json, datetime
 
-          FILE_URL = "https://cetredeneoconcursos.com.br/Concursos_PDF/093_Concurso/093_Concurso093.pdf"
-          TOKEN = os.environ["TELEGRAM_TOKEN"]
-          CHAT_ID = os.environ["CHAT_ID"]
-          STATE_FILE = "state.json"
+#           FILE_URL = "https://cetredeneoconcursos.com.br/Concursos_PDF/093_Concurso/093_Concurso093.pdf"
+#           TOKEN = os.environ["TELEGRAM_TOKEN"]
+#           CHAT_ID = os.environ["CHAT_ID"]
+#           STATE_FILE = "state.json"
 
-          def get_hash():
-              try:
-                  r = requests.get(FILE_URL, timeout=20)
-                  if r.status_code == 200:
-                      return hashlib.md5(r.content).hexdigest()
-              except Exception as e:
-                  print("Erro ao baixar PDF:", e)
-              return None
+#           def get_hash():
+#               try:
+#                   r = requests.get(FILE_URL, timeout=20)
+#                   if r.status_code == 200:
+#                       return hashlib.md5(r.content).hexdigest()
+#               except Exception as e:
+#                   print("Erro ao baixar PDF:", e)
+#               return None
 
-          def send_message(text):
-              try:
-                  requests.post(
-                      f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-                      data={"chat_id": CHAT_ID, "text": text}
-                  )
-              except Exception as e:
-                  print("Erro ao enviar mensagem:", e)
+#           def send_message(text):
+#               try:
+#                   requests.post(
+#                       f"https://api.telegram.org/bot{TOKEN}/sendMessage",
+#                       data={"chat_id": CHAT_ID, "text": text}
+#                   )
+#               except Exception as e:
+#                   print("Erro ao enviar mensagem:", e)
 
-          def check_new_messages():
-              try:
-                  r = requests.get(f"https://api.telegram.org/bot{TOKEN}/getUpdates").json()
-                  if "result" in r:
-                      for update in r["result"]:
-                          if "message" in update:
-                              text = update["message"].get("text", "").lower()
-                              if text in ["oi", "ola", "olá", "salve"]:
-                                  send_message("👋 Oi! Estou monitorando o arquivo do concurso pra você.")
-                              elif "pdf" in text:
-                                  send_message(f"📄 Link do arquivo: {FILE_URL}")
-                              elif "status" in text:
-                                  send_message("✅ O bot está rodando normalmente e monitorando o PDF.")
-                              else:
-                                  send_message("🤖 Comando não reconhecido, mas estou de olho no PDF pra você!")
-              except Exception as e:
-                  print("Erro ao checar mensagens:", e)
+#           def check_new_messages():
+#               try:
+#                   r = requests.get(f"https://api.telegram.org/bot{TOKEN}/getUpdates").json()
+#                   if "result" in r:
+#                       for update in r["result"]:
+#                           if "message" in update:
+#                               text = update["message"].get("text", "").lower()
+#                               if text in ["oi", "ola", "olá", "salve"]:
+#                                   send_message("👋 Oi! Estou monitorando o arquivo do concurso pra você.")
+#                               elif "pdf" in text:
+#                                   send_message(f"📄 Link do arquivo: {FILE_URL}")
+#                               elif "status" in text:
+#                                   send_message("✅ O bot está rodando normalmente e monitorando o PDF.")
+#                               else:
+#                                   send_message("🤖 Comando não reconhecido, mas estou de olho no PDF pra você!")
+#               except Exception as e:
+#                   print("Erro ao checar mensagens:", e)
 
-          def main():
-              check_new_messages()
-              current_hash = get_hash()
-              if not current_hash:
-                  send_message("⚠️ Erro ao acessar o PDF.")
-                  return
+#           def main():
+#               check_new_messages()
+#               current_hash = get_hash()
+#               if not current_hash:
+#                   send_message("⚠️ Erro ao acessar o PDF.")
+#                   return
 
-              if os.path.exists(STATE_FILE):
-                  last_hash = json.load(open(STATE_FILE)).get("hash")
-              else:
-                  last_hash = None
+#               if os.path.exists(STATE_FILE):
+#                   last_hash = json.load(open(STATE_FILE)).get("hash")
+#               else:
+#                   last_hash = None
 
-              if last_hash != current_hash:
-                  timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
-                  send_message(f"🚨 O arquivo foi atualizado em {timestamp}!\n{FILE_URL}")
-              json.dump({"hash": current_hash}, open(STATE_FILE, "w"))
+#               if last_hash != current_hash:
+#                   timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+#                   send_message(f"🚨 O arquivo foi atualizado em {timestamp}!\n{FILE_URL}")
+#               json.dump({"hash": current_hash}, open(STATE_FILE, "w"))
 
-          main()
-          EOF
+#           main()
+#           EOF
