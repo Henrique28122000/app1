@@ -21,8 +21,8 @@ jobs:
           import requests, hashlib, os, json, datetime
 
           FILE_URL = "https://cetredeneoconcursos.com.br/Concursos_PDF/093_Concurso/093_Concurso093.pdf"
-          TOKEN = os.environ["TELEGRAM_TOKEN"]
-          CHAT_ID = os.environ["CHAT_ID"]
+          TOKEN = os.environ["5600089920:AAE58XD5WFIKwfSJy1KERw5CGwvFHFYmjvE"]
+          CHAT_ID = os.environ["5060246658"]
           STATE_FILE = "state.json"
 
           def get_hash():
