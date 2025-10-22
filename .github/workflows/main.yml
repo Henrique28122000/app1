@@ -9,7 +9,7 @@ jobs:
   monitorar:
     runs-on: ubuntu-latest
     steps:
-      - name: Baixar dependências
+      - name: Instalar dependências
         run: pip install requests
 
       - name: Executar script de monitoramento
@@ -17,6 +17,7 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: |
+          python - <<'EOF'
           import requests, hashlib, os, json
 
           FILE_URL = "https://cetredeneoconcursos.com.br/Concursos_PDF/093_Concurso/093_Concurso093.pdf"
@@ -25,27 +26,38 @@ jobs:
           STATE_FILE = "state.json"
 
           def get_hash():
-              r = requests.get(FILE_URL, timeout=20)
-              if r.status_code == 200:
-                  return hashlib.md5(r.content).hexdigest()
+              try:
+                  r = requests.get(FILE_URL, timeout=20)
+                  if r.status_code == 200:
+                      return hashlib.md5(r.content).hexdigest()
+              except Exception as e:
+                  print("Erro ao baixar o PDF:", e)
               return None
 
           def send_message(text):
-              requests.post(f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-                            data={"chat_id": CHAT_ID, "text": text})
+              try:
+                  requests.post(f"https://api.telegram.org/bot{TOKEN}/sendMessage",
+                                data={"chat_id": CHAT_ID, "text": text})
+              except Exception as e:
+                  print("Erro ao enviar mensagem:", e)
 
           def check_new_messages():
-              r = requests.get(f"https://api.telegram.org/bot{TOKEN}/getUpdates").json()
-              if "result" in r:
-                  for update in r["result"]:
-                      if "message" in update:
-                          text = update["message"]["text"].lower()
-                          if text in ["oi", "olá", "ola", "salve"]:
-                              send_message("👋 Oi! Estou monitorando o arquivo do concurso pra você.")
-                          elif "pdf" in text:
-                              send_message(f"📄 Link do arquivo: {FILE_URL}")
-                          else:
-                              send_message("🤖 Comando não reconhecido, mas estou de olho no PDF pra você!")
+              try:
+                  r = requests.get(f"https://api.telegram.org/bot{TOKEN}/getUpdates").json()
+                  if "result" in r:
+                      for update in r["result"]:
+                          if "message" in update:
+                              text = update["message"].get("text", "").lower()
+                              if text in ["oi", "ola", "olá", "salve"]:
+                                  send_message("👋 Oi! Estou monitorando o arquivo do concurso pra você.")
+                              elif "pdf" in text:
+                                  send_message(f"📄 Link do arquivo: {FILE_URL}")
+                              elif "status" in text:
+                                  send_message("✅ O bot está rodando normalmente e monitorando o PDF.")
+                              else:
+                                  send_message("🤖 Comando não reconhecido, mas estou de olho no PDF pra você!")
+              except Exception as e:
+                  print("Erro ao checar mensagens:", e)
 
           def main():
               check_new_messages()
@@ -53,8 +65,9 @@ jobs:
               if not current_hash:
                   send_message("⚠️ Erro ao acessar o PDF.")
                   return
+
               if os.path.exists(STATE_FILE):
-                  last_hash = json.load(open(STATE_FILE))["hash"]
+                  last_hash = json.load(open(STATE_FILE)).get("hash")
               else:
                   last_hash = None
 
@@ -63,3 +76,4 @@ jobs:
               json.dump({"hash": current_hash}, open(STATE_FILE, "w"))
 
           main()
+          EOF
