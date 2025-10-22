@@ -12,17 +12,17 @@ jobs:
       - name: Instalar dependências
         run: pip install requests
 
-      - name: Executar script de monitoramento
+      - name: Executar script Python
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: |
           python - <<'EOF'
-          import requests, hashlib, os, json
+          import requests, hashlib, os, json, datetime
 
           FILE_URL = "https://cetredeneoconcursos.com.br/Concursos_PDF/093_Concurso/093_Concurso093.pdf"
-          TOKEN = os.environ["5600089920:AAE58XD5WFIKwfSJy1KERw5CGwvFHFYmjvE"]
-          CHAT_ID = os.environ["5060246658"]
+          TOKEN = os.environ["TELEGRAM_TOKEN"]
+          CHAT_ID = os.environ["CHAT_ID"]
           STATE_FILE = "state.json"
 
           def get_hash():
@@ -31,13 +31,15 @@ jobs:
                   if r.status_code == 200:
                       return hashlib.md5(r.content).hexdigest()
               except Exception as e:
-                  print("Erro ao baixar o PDF:", e)
+                  print("Erro ao baixar PDF:", e)
               return None
 
           def send_message(text):
               try:
-                  requests.post(f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-                                data={"chat_id": CHAT_ID, "text": text})
+                  requests.post(
+                      f"https://api.telegram.org/bot{TOKEN}/sendMessage",
+                      data={"chat_id": CHAT_ID, "text": text}
+                  )
               except Exception as e:
                   print("Erro ao enviar mensagem:", e)
 
@@ -72,7 +74,8 @@ jobs:
                   last_hash = None
 
               if last_hash != current_hash:
-                  send_message(f"🚨 O arquivo foi atualizado!\n{FILE_URL}")
+                  timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+                  send_message(f"🚨 O arquivo foi atualizado em {timestamp}!\n{FILE_URL}")
               json.dump({"hash": current_hash}, open(STATE_FILE, "w"))
 
           main()
