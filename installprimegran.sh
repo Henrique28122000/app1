@@ -63,8 +63,9 @@ server {
     }
 }
 EOF
+ln -sf /etc/nginx/sites-available/$DOMINIO /etc/nginx/sites-enabled/
 
-ln -s /etc/nginx/sites-available/$DOMINIO /etc/nginx/sites-enabled/
+
 nginx -t
 systemctl reload nginx
 
