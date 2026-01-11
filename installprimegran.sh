@@ -70,7 +70,7 @@ nginx -t
 systemctl reload nginx
 
 echo "== SSL Let's Encrypt =="
-certbot --nginx -d $DOMINIO -d www.$DOMINIO --non-interactive --agree-tos -m admin@$DOMINIO
+certbot --nginx -d $DOMINIO -d $DOMINIO --non-interactive --agree-tos -m admin@$DOMINIO
 
 echo "== PRONTO =="
 echo "Site disponível em: https://$DOMINIO"
